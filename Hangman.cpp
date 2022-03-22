@@ -6,27 +6,31 @@
 
 using namespace std;
 
+const char DATA_FILE[] = "Word_list.txt";
 char readAGuess();
-bool contains(string secretWord, char guess);
-void update(string &guessedWord, string &secretWord, char guess);
+bool contains(const string secretWord, char guess);
+void update(string &guessedWord, const string &secretWord, char guess);
 
 int main()
 {
-    srand(time(0));
-    string secretWord = chooseWord();
+    srand(time(NULL));
+    string secretWord = chooseWord(DATA_FILE);
     string guessedWord = string(secretWord.length(), '-');
+    string oldGuessedWord = "";
     int badGuessCount = 0;
     do 
     {
-        renderGame(guessedWord, badGuessCount);
+        renderGame(guessedWord, badGuessCount, oldGuessedWord);
         char guess = readAGuess();
         if (contains(secretWord, guess))
             update(guessedWord, secretWord, guess);
         else ++badGuessCount;
+        oldGuessedWord += guess;
     } while (badGuessCount < 7 && secretWord != guessedWord);
-    renderGame(guessedWord, badGuessCount);
-    if (badGuessCount < 7) cout << "Congratulations! You win!";
-    else cout << "You lost. The correct word is " << secretWord; 
+    renderGame(guessedWord, badGuessCount, oldGuessedWord);
+    clearScreen();
+    bool win = secretWord == guessedWord;
+    displayResult(win, secretWord); 
     return 0;
 }
 
@@ -40,7 +44,7 @@ char readAGuess()
 }
 
 // Check if the secret word contains the guess
-bool contains(string secretWord, char guess)
+bool contains(const string secretWord, char guess)
 {
     int len = secretWord.length();
     for (int i = 0; i < len; ++i)
@@ -51,7 +55,7 @@ bool contains(string secretWord, char guess)
 }
 
 // Update the guessed word
-void update(string &guessedWord, string &secretWord, char guess)
+void update(string &guessedWord, const string &secretWord, char guess)
 {
     int len = secretWord.length();
     for (int i = 0; i < len; ++i)
